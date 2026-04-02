@@ -1,0 +1,115 @@
+
+from models.cuenta import Cuenta
+import random
+
+def creacion_cuentas(usuario_encontrado, usuarios_aplicacion):
+    
+        print("\n--- CREAR CUENTA ---")
+        print("1. Ahorros")
+        print("2. Corriente")
+        tipo_cuenta_crear = int(input("Seleccione el tipo de cuenta: "))
+        if tipo_cuenta_crear == 1:
+            tipo_cuenta = "Ahorros"
+
+        elif tipo_cuenta_crear == 2:
+            tipo_cuenta = "Corriente"
+        else:
+            print("\nOpción no válida. Volviendo al menú principal.")
+            return
+        while True:
+            numero_cuenta_random = random.randint(1000000000, 9999999999)
+            if not any(
+                cuenta.numero_cuenta == numero_cuenta_random
+                for usuario in usuarios_aplicacion.values()
+                for cuenta in usuario.cuentas_bancarias
+            ):
+                break
+        nueva_cuenta = Cuenta(tipo_cuenta, numero_cuenta_random)
+        usuario_encontrado.agregar_cuenta(nueva_cuenta)
+        print(
+                f"\nCuenta {tipo_cuenta} creada exitosamente con número: {numero_cuenta_random}."
+            )
+        
+def consulta_cuentas(usuario_encontrado):
+    print("\n--- CONSULTAR CUENTAS ---")
+    if not usuario_encontrado.cuentas_bancarias:
+        print("\nNo tienes cuentas bancarias registradas.")
+    else:
+        print("\nTus cuentas bancarias:")
+        for i, cuenta in enumerate(
+            usuario_encontrado.cuentas_bancarias, start=1
+        ):
+            print(
+                f"{i}. Tipo: {cuenta.tipo_cuenta}, Número: {cuenta.numero_cuenta}, Saldo: {cuenta.saldo}"
+            )
+
+def realizar_transaccion(usuario_encontrado):
+    print("\n--- HACER TRANSACCIONES ---")
+    if not usuario_encontrado.cuentas_bancarias:
+        print("\nNo tienes cuentas bancarias registradas.")
+        return
+    else:
+        print("\nTus cuentas bancarias:")
+        for i, cuenta in enumerate(
+            usuario_encontrado.cuentas_bancarias, start=1):
+            print(
+                f"{i}. Tipo: {cuenta.tipo_cuenta}, Número: {cuenta.numero_cuenta}, Saldo: {cuenta.saldo}"
+        )
+        cuenta_seleccionada = int(
+            input("Seleccione la cuenta para realizar la transacción: ")
+        )
+        if cuenta_seleccionada < 1 or cuenta_seleccionada > len(
+            usuario_encontrado.cuentas_bancarias
+        ):
+            print("\nOpción no válida. Volviendo al menú principal.")
+            return
+        cuenta_elegida = usuario_encontrado.cuentas_bancarias[
+            cuenta_seleccionada - 1]
+        
+    print("\n1. Consignar")
+    print("2. Retirar")
+    tipo_transaccion = int(
+        input("Seleccione el tipo de transacción: ")
+    )
+
+    if tipo_transaccion not in [1, 2]:
+        print("\nOpción no válida. Volviendo al menú principal.")
+        return
+    monto = float(input("Ingrese el monto de la transacción: "))
+
+    if monto <= 0:
+        print(
+            "\nEl monto debe ser mayor a cero. Volviendo al menú principal."
+        )
+        return
+    if tipo_transaccion == 1:
+        cuenta_elegida.consignar(monto)
+        print(f"\nConsignación de {monto} realizada exitosamente.")
+    elif tipo_transaccion == 2:
+        if cuenta_elegida.retirar(monto):
+            print(f"\nRetiro de {monto} realizado exitosamente.")
+
+def mostrar_historial_transacciones(usuario_encontrado):
+    print("\n--- HISTORIAL DE TRANSACCIONES ---")
+    for i, cuenta in enumerate(
+        usuario_encontrado.cuentas_bancarias, start=1
+    ):
+        print(
+            f"Cuenta {i} - Tipo: {cuenta.tipo_cuenta}, Número: {cuenta.numero_cuenta}"
+        )
+    cuenta_consultada = int(
+        input("\nSeleccione la cuenta para ver el historial de transacciones: ")
+    )
+    if cuenta_consultada < 1 or cuenta_consultada > len(
+        usuario_encontrado.cuentas_bancarias
+    ):
+        print("\nOpción no válida. Volviendo al menú principal.")
+        return
+    cuenta_consultada = usuario_encontrado.cuentas_bancarias[
+        cuenta_consultada - 1 ]
+    if not cuenta_consultada.historial_transacciones:
+        print("\nNo hay transacciones registradas para esta cuenta.")
+    else:
+        print("\nHistorial de transacciones:")
+        for movimiento in cuenta_consultada.historial_transacciones:
+            print(movimiento)
