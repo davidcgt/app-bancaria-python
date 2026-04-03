@@ -43,7 +43,7 @@ def consulta_cuentas(usuario_encontrado):
                 f"{i}. Tipo: {cuenta.tipo_cuenta}, Número: {cuenta.numero_cuenta}, Saldo: {cuenta.saldo}"
             )
 
-def realizar_transaccion(usuario_encontrado):
+def realizar_transaccion(usuario_encontrado, usuarios_aplicacion):
     print("\n--- HACER TRANSACCIONES ---")
     if not usuario_encontrado.cuentas_bancarias:
         print("\nNo tienes cuentas bancarias registradas.")
@@ -55,9 +55,13 @@ def realizar_transaccion(usuario_encontrado):
             print(
                 f"{i}. Tipo: {cuenta.tipo_cuenta}, Número: {cuenta.numero_cuenta}, Saldo: {cuenta.saldo}"
         )
-        cuenta_seleccionada = int(
-            input("Seleccione la cuenta para realizar la transacción: ")
-        )
+        try:
+            cuenta_seleccionada = int(
+                input("Seleccione la cuenta para realizar la transacción: ")
+            )
+        except ValueError:
+            print("\nOpción no válida. Volviendo al menú principal.")
+            return
         if cuenta_seleccionada < 1 or cuenta_seleccionada > len(
             usuario_encontrado.cuentas_bancarias
         ):
@@ -68,14 +72,23 @@ def realizar_transaccion(usuario_encontrado):
         
     print("\n1. Consignar")
     print("2. Retirar")
-    tipo_transaccion = int(
-        input("Seleccione el tipo de transacción: ")
-    )
-
-    if tipo_transaccion not in [1, 2]:
+    print("3. Transferir a otra cuenta")
+    try:
+        tipo_transaccion = int(
+            input("Seleccione el tipo de transacción: ")
+        )
+    except ValueError:
         print("\nOpción no válida. Volviendo al menú principal.")
         return
-    monto = float(input("Ingrese el monto de la transacción: "))
+
+    if tipo_transaccion not in [1, 2, 3]:
+        print("\nOpción no válida. Volviendo al menú principal.")
+        return
+    try:
+        monto = float(input("Ingrese el monto de la transacción: "))
+    except ValueError:
+        print("\nOpción no válida. Volviendo al menú principal.")
+        return
 
     if monto <= 0:
         print(
@@ -88,6 +101,31 @@ def realizar_transaccion(usuario_encontrado):
     elif tipo_transaccion == 2:
         if cuenta_elegida.retirar(monto):
             print(f"\nRetiro de {monto} realizado exitosamente.")
+    elif tipo_transaccion == 3:
+        try:
+            numero_cuenta_destino = int(
+                input("Ingrese el número de cuenta destino: ")
+            )
+        except ValueError:
+            print("\nOpción no válida. Volviendo al menú principal.")
+            return
+        cuenta_destino = None
+        for usuario in usuarios_aplicacion.values():
+            for cuenta in usuario.cuentas_bancarias:
+                if cuenta.numero_cuenta == numero_cuenta_destino:
+                    cuenta_destino = cuenta
+                    break
+            if cuenta_destino:
+                break
+        if not cuenta_destino:
+            print("\nCuenta destino no encontrada. Volviendo al menú principal.")
+            return
+        if cuenta_elegida.transferir(monto, cuenta_destino):
+            print(
+                f"\nTransferencia de {monto} a la cuenta {numero_cuenta_destino} realizada exitosamente."
+            )
+
+        
 
 def mostrar_historial_transacciones(usuario_encontrado):
     print("\n--- HISTORIAL DE TRANSACCIONES ---")
@@ -113,3 +151,4 @@ def mostrar_historial_transacciones(usuario_encontrado):
         print("\nHistorial de transacciones:")
         for movimiento in cuenta_consultada.historial_transacciones:
             print(movimiento)
+

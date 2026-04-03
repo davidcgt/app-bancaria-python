@@ -26,3 +26,11 @@ class Cuenta:
         self.saldo -= monto
         self.historial_transacciones.append(f"Retiro: -{monto}")
         return True
+    def transferir(self, monto, cuenta_destino):
+        if self.retirar(monto):
+            cuenta_destino.consignar(monto)
+            cuenta_destino.historial_transacciones.append(f"Transferencia recibida: +{monto} desde cuenta {self.numero_cuenta}")
+            self.historial_transacciones.append(f"Transferencia enviada: -{monto} a cuenta {cuenta_destino.numero_cuenta}")
+            return True
+        return False
+        
