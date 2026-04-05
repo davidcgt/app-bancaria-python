@@ -1,6 +1,7 @@
 
 from models.cuenta import Cuenta
 import random
+from services.file_service import guardar_datos
 
 def creacion_cuentas(usuario_encontrado, usuarios_aplicacion):
     
@@ -26,6 +27,7 @@ def creacion_cuentas(usuario_encontrado, usuarios_aplicacion):
                 break
         nueva_cuenta = Cuenta(tipo_cuenta, numero_cuenta_random)
         usuario_encontrado.agregar_cuenta(nueva_cuenta)
+        guardar_datos(usuarios_aplicacion)
         print(
                 f"\nCuenta {tipo_cuenta} creada exitosamente con número: {numero_cuenta_random}."
             )
@@ -97,9 +99,11 @@ def realizar_transaccion(usuario_encontrado, usuarios_aplicacion):
         return
     if tipo_transaccion == 1:
         cuenta_elegida.consignar(monto)
+        guardar_datos(usuarios_aplicacion)
         print(f"\nConsignación de {monto} realizada exitosamente.")
     elif tipo_transaccion == 2:
         if cuenta_elegida.retirar(monto):
+            guardar_datos(usuarios_aplicacion)
             print(f"\nRetiro de {monto} realizado exitosamente.")
     elif tipo_transaccion == 3:
         try:
@@ -121,6 +125,7 @@ def realizar_transaccion(usuario_encontrado, usuarios_aplicacion):
             print("\nCuenta destino no encontrada. Volviendo al menú principal.")
             return
         if cuenta_elegida.transferir(monto, cuenta_destino):
+            guardar_datos(usuarios_aplicacion)
             print(
                 f"\nTransferencia de {monto} a la cuenta {numero_cuenta_destino} realizada exitosamente."
             )

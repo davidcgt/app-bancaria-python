@@ -9,11 +9,11 @@ historial de transacciones
 
 
 class Cuenta:
-    def __init__(self, tipo_cuenta, numero_cuenta, saldo=0):
+    def __init__(self, tipo_cuenta, numero_cuenta, saldo=0, historial_transacciones =None):
         self.tipo_cuenta = tipo_cuenta
         self.numero_cuenta = numero_cuenta
         self.saldo = saldo
-        self.historial_transacciones = []
+        self.historial_transacciones = historial_transacciones if historial_transacciones else []
 
     def consignar(self, monto):
         self.saldo += monto
