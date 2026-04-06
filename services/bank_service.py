@@ -2,6 +2,7 @@
 from models.cuenta import Cuenta
 import random
 from services.file_service import guardar_datos
+from services.database import guardar_cuenta_db
 
 def creacion_cuentas(usuario_encontrado, usuarios_aplicacion):
     
@@ -27,7 +28,7 @@ def creacion_cuentas(usuario_encontrado, usuarios_aplicacion):
                 break
         nueva_cuenta = Cuenta(tipo_cuenta, numero_cuenta_random)
         usuario_encontrado.agregar_cuenta(nueva_cuenta)
-        guardar_datos(usuarios_aplicacion)
+        guardar_cuenta_db(nueva_cuenta,usuario_encontrado)
         print(
                 f"\nCuenta {tipo_cuenta} creada exitosamente con número: {numero_cuenta_random}."
             )

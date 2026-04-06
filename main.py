@@ -5,16 +5,17 @@ from services.auth_service import iniciar_sesion
 from services.menus import menu_login
 from services.menus import menu_usuario_validado
 from services.bank_service import creacion_cuentas, consulta_cuentas,realizar_transaccion, mostrar_historial_transacciones
-from services.file_service import cargar_datos, guardar_datos
+from services.database import inicializar_db,cargar_usuarios_db
+
 
 # PROYECTO DE APP BANCARIA
 
 # LISTA DE USUARIOS
 
+inicializar_db()
 
-usuarios_aplicacion = cargar_datos()  # carga los usuarios guardados
-if not usuarios_aplicacion:
-    usuarios_aplicacion = {}  # si el JSON está vacío, arranca vacío
+
+usuarios_aplicacion = cargar_usuarios_db()
 
 
 def manejar_login(usuarios_aplicacion):
@@ -62,7 +63,7 @@ def manejar_login(usuarios_aplicacion):
 
         if resultado_registro["success"]:
             print("\nUsuario registrado exitosamente.")
-            guardar_datos(usuarios_aplicacion)
+           
         else:
             print(f"\nError al registrar usuario: {resultado_registro['mensaje']}")
 

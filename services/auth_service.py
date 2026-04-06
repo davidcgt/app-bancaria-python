@@ -1,4 +1,5 @@
 from models.usuario import Usuario
+from services.database import registrar_usuario_db
 
 def registrar_usuario(usuarios_aplicacion, nombre, apellido, cedula, username, contraseña):
     if username in usuarios_aplicacion:
@@ -8,6 +9,7 @@ def registrar_usuario(usuarios_aplicacion, nombre, apellido, cedula, username, c
     else:
         nuevo_usuario = Usuario(nombre, apellido, cedula, username, contraseña)
         usuarios_aplicacion[username] = nuevo_usuario
+        registrar_usuario_db(nuevo_usuario)
         return {"success": True, "mensaje": "Usuario registrado exitosamente."}
     
 def iniciar_sesion(usuarios_aplicacion, username, contraseña):
