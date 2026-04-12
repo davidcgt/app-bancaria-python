@@ -66,6 +66,10 @@ def cargar_usuarios_db():
         cuentas = cursor.fetchall()
         for cuenta in cuentas:
             cuenta_cargada =Cuenta(cuenta[1],cuenta[2],cuenta[3])
+            cursor.execute("SELECT descripcion FROM historial_transacciones WHERE cuenta_id = ?", (cuenta[0],))
+            historial = cursor.fetchall()
+            for movimiento in historial:
+                cuenta_cargada.historial_transacciones.append(movimiento[0])
             
             usuario_cargado.agregar_cuenta(cuenta_cargada)
         usuarios[resultado[4]] = usuario_cargado
@@ -87,5 +91,30 @@ def guardar_cuenta_db(cuenta,usuario):
 
     conexion.commit()
 
+def actualizar_saldo_db(cuenta):
+    conexion = sqlite3.connect("data/base_usuarios.db")
+    cursor = conexion.cursor()
 
+    cursor.execute("""
+        
+        UPDATE cuentas SET saldo = ? WHERE numero_cuenta = ?
+    """, (cuenta.saldo , cuenta.numero_cuenta))
+    conexion.commit()
+
+
+    conexion.close()
+
+def actualizar_historial(descripcion, cuenta):
+    conexion = sqlite3.connect("data/base_usuarios.db")
+    cursor = conexion.cursor()
+
+    cursor.execute("SELECT id FROM cuentas WHERE numero_cuenta = ?", (cuenta.numero_cuenta,))
+    resultado = cursor.fetchone()
+
+    cursor.execute("""
+    INSERT INTO historial_transacciones (descripcion, cuenta_id)
+    VALUES (?, ?)
+    """, (descripcion, resultado[0]))
+
+    conexion.commit()
     conexion.close()

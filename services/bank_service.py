@@ -1,8 +1,7 @@
 
 from models.cuenta import Cuenta
 import random
-from services.file_service import guardar_datos
-from services.database import guardar_cuenta_db
+from services.database import guardar_cuenta_db,actualizar_saldo_db, actualizar_historial
 
 def creacion_cuentas(usuario_encontrado, usuarios_aplicacion):
     
@@ -100,12 +99,16 @@ def realizar_transaccion(usuario_encontrado, usuarios_aplicacion):
         return
     if tipo_transaccion == 1:
         cuenta_elegida.consignar(monto)
-        guardar_datos(usuarios_aplicacion)
+        
+        actualizar_saldo_db(cuenta_elegida)
         print(f"\nConsignación de {monto} realizada exitosamente.")
+        actualizar_historial(cuenta_elegida.historial_transacciones[-1],cuenta_elegida)
     elif tipo_transaccion == 2:
         if cuenta_elegida.retirar(monto):
-            guardar_datos(usuarios_aplicacion)
+            
+            actualizar_saldo_db(cuenta_elegida)
             print(f"\nRetiro de {monto} realizado exitosamente.")
+            actualizar_historial(cuenta_elegida.historial_transacciones[-1],cuenta_elegida)
     elif tipo_transaccion == 3:
         try:
             numero_cuenta_destino = int(
@@ -126,10 +129,13 @@ def realizar_transaccion(usuario_encontrado, usuarios_aplicacion):
             print("\nCuenta destino no encontrada. Volviendo al menú principal.")
             return
         if cuenta_elegida.transferir(monto, cuenta_destino):
-            guardar_datos(usuarios_aplicacion)
+            actualizar_saldo_db(cuenta_elegida)
+            actualizar_saldo_db(cuenta_destino)
             print(
                 f"\nTransferencia de {monto} a la cuenta {numero_cuenta_destino} realizada exitosamente."
             )
+            actualizar_historial(cuenta_elegida.historial_transacciones[-1],cuenta_elegida)
+            actualizar_historial(cuenta_destino.historial_transacciones[-1],cuenta_destino)
 
         
 
